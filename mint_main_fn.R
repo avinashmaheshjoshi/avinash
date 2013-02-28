@@ -699,14 +699,11 @@ mint_main_fn = function(){
         return(paste(prevJson,"\"ErrorCode\":400}", sep=","))
       }
     }
-    if(length(which(res1==-1)) > 0){
-      res1 = res1[1:min(which(res1==-1))-1,]
-    }
     #remove the time column
     res1 <- res1[,-ncol(res1)]
-    
-  write.csv(res1,"retDataOut.csv")
-  if(fillCount  >= 2000){
+   
+  
+  if(fillCount  >= frameSize){
     
     pearson_mat = getCor(res1)
     # sometimes, when the frame size is too low, we may get cor values to be 1/-1. To circumvent this, we make the cor values 0.99
