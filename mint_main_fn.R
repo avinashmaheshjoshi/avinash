@@ -140,9 +140,10 @@ dfMatrix <- matrix(-1,nrow=frameSize,ncol=nSymbols+1)
 fillCount <- 1
 iterC <- 1
 tradeTime <- "\"NULL\""
-marketIndicator <- "NA"
-
-
+marketIndicator <- "\"NULL\""
+updateCount <- 100
+consumer<-initialize.consumer('tcp://162.192.100.46:61616','T','jadeStockStream')
+closedFlag<-TRUE
 
 
 
@@ -197,6 +198,16 @@ readFromDb = function(){
 # call the above function
 readFromDb()
 
+#___________________________________________________________________________________________________________________
+# Consumer function to consume from ActiveMQ
+#___________________________________________________________________________________________________________________
+
+consumeFn<-function(){
+  z<-consume(consumer,asString=TRUE)  
+  a1<-strsplit(strsplit(z,split="args\":")[[1]][2],split=",")[[1]]
+  a3<-gsub('[^ a-zA-Z0-9:.-]', '',a1)
+  return(paste(a3[-c(8,9)],collapse=","))
+}
 
 #______________________________________________________________________________________
 # data frame charging function
@@ -256,36 +267,30 @@ dfChargeUsePrev <- function(tickerId, askPrice, tradeTime){
 # Function to create a data frame consisting of all the tickers
 #______________________________________________________________________________________
 
-dfCharge_for_multi_ticks = function(stockdata){
+dfCharge_for_multi_ticks = function(streamData){
   
-  res=NULL
-  tickers_3000 = strsplit(stockdata,";")
-  tickers_3000 = unlist(tickers_3000)
-  
-  for(stock in 1:length(tickers_3000)){
+  if(length(streamData)!=0){
+    d1<-unlist(strsplit(strsplit(streamData,split=",")[[1]],split=":"))
+    if(!is.na(d1[20])){
+      askPrice<-as.numeric(d1[7])
+      tickerId<-d1[20]
+      tradeTime<<-paste(d1[15:18],collapse=":")
+      marketIndicator <<- d1[22]
+    }
+    else{
+      askPrice<-as.numeric(d1[2])
+      tickerId<-d1[9]
+      tradeTime<<-paste(d1[4:7],collapse=":")
+      marketIndicator <<- d1[15]
+    }
     
-    stock_vec = strsplit(tickers_3000[stock],",")
-    stock_vec = unlist(stock_vec)
-    tradeTime <<- stock_vec[3]
-    res=dfChargeUsePrev(stock_vec[1],as.numeric(stock_vec[2]),tradeTime)
+    res=dfChargeUsePrev(tickerId,askPrice,tradeTime)
+    res = res$dFrame
+    return(res)
+    
     
   }
   
-  
-  res1=as.data.frame(res$dFrame)
-  
-  if(length(which(res1==-1)) > 0){
-    res1 = res1[1:min(which(res1==-1))-1,]
-  }
-  
-  #_______________________________________________________________________________
-  # if the data frame is not charged to the frameSize value, the unfilled
-  # rows of the data frame are truncated
-  #_______________________________________________________________________________
-  
-  res1 = as.data.frame(res1[,-ncol(res1)])
-  
-  return(res1)
 }
 
 
@@ -660,18 +665,45 @@ jsonCreator <- function(corMat, samMat, adjMat){
 #____________________________________________________________________________________
 # Function to call it all (get the corr graph)
 #____________________________________________________________________________________
-mint_main_fn = function(dat){
+mint_main_fn = function(){
   
   debugFlag <- F
   #tryCatch({
+  # to refresh the data frame when the market is open
+  # closedFlag ensures that that the dataFrame is refreshed only once
+  if(!is.na(marketIndicator)){
+    if(marketIndicator == "closed"){
+      closedFlag<<-TRUE
+    }
+    if(marketIndicator == "open" && closedFlag){
+      retDf <<- as.data.frame(matrix(-1, nrow = 1, ncol=nSymbols))
+      colnames(retDf) <<- symbolVec
+      retFrameCount <<- 0
+      dfMatrix <<- matrix(-1,nrow=frameSize,ncol=nSymbols+1)
+      fillCount <<-1
+      readFromDb()
+      closedFlag <<- FALSE
+    }
+  }
+   
+    for(i in 1:updateCount){
+      # check for ActiveMQ connection
+      tryCatch({streamData <- consumeFn()}, error=function(err){errorCode<<-400}, finally={})
+      if((errorCode != 400) && exists("streamData")){
+        res1 = dfCharge_for_multi_ticks(streamData)
+      }  
+      else{
+        errorCode <<- 0
+        Sys.sleep(15)
+        # send the last updated json with the error code of 400
+        return(paste(prevJson,"\"ErrorCode\":400}", sep=","))
+      }
+    }
+    #remove the time column
+    res1 <- res1[,-ncol(res1)]
+   
   
-      
-        res1 = dfCharge_for_multi_ticks(dat)
-      
-    
-    
-  #write.csv(res1,"retDataOut.csv")
-  if(fillCount  >= 2000){
+  if(fillCount  >= frameSize){
     
     pearson_mat = getCor(res1)
     # sometimes, when the frame size is too low, we may get cor values to be 1/-1. To circumvent this, we make the cor values 0.99
