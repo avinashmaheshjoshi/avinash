@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage[pdftex,bookmarks=true]{hyperref}
+\usepackage{amsmath}
+\setlength\parindent{0pt}
+
+\title{Implementation of Ant Colony Optimization in Parallel}
+\author{Avinash Joshi}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Ant Colony Optimization(ACO) is a meta heuristic algorithm for solving combinatorial optimization problems. Its major application is in finding good paths in a graph. The ``Travelling Salesman Problem(TSP)" is one of the most famoust combinatorial optimization problems. ACO is one of the high performance computing methods for TSP. ACO has its drawbacks of stagnation, high computational time and premature convergence of solution. These drawbacks becoms more obvious as the size of the solutions space increases. This paper proposes a parallel implementation of the ACO algorithm to overcome these drawbacks.   
+\end{abstract}
+\clearpage
+
+\tableofcontents
+
+\section{Iteration Number}
+1
+
+\section{Introduction}
+Ant Colony Optimization(ACO) is a meta heuristic algorithm for combinatorial optimization problems. ACO algorithm models the behavior of real ant colonies in establishing the shortest path between food sources and nests. Ants can communicate with one another through chemicals called pheromones in their immediate environment. The ants release pheromone on the ground while walking from their nest to food and then go back to the nest. The ants move according to the amount of pheromones, the richer the pheromone trail on a path is, the more likely it would be followed by other ants. A shorter path has a higher amount of pheromone in probability, ants will tend to choose a shorter path. Through this mechanism, ants will eventually find the shortest path.\\
+ACO algorithms are mainly used to find shortest paths in a connected graph with multiple nodes. In this paper, the famous ``Travelling Salesman Problem" shall be solved using ACO. TSP can be represented as a completely weighted graph $G = (N,A)$ where $N$ is the set of nodes, representing the cities, and $A$ is the set of arcs completely connecting $N$. Each arc is assigned a value $d_{ij}$, which is the length of the arc $(i,j) \in A$ i.e the distance between cities $i$ and $j$ where $(i,j) \in N$. The objective of the problem is to find a minimal length Hamiltonian circuit of the graph, where an Hamiltonian circuit is a closed tour visiting exactly once each of the $n \in N$ nodes of G.
+\subsection{Applying ACO to TSP}
+In ACO algorithms ants are simple agents which, in the TSP case, construct tours by moving from city to city on the problem graph. The ants' solution construction is guided by (artificial) pheromone trails and a priori available heuristic information which in this case is the distance between cities. When applying ACO algorithm to the TSP,
+a pheromone strength $\tau_{ij}(t)$ is associated to each arc $(i,j)$, where $\tau_{ij}(t)$ is a numerical information which is modified during the run of the algorithm and t is the iteration counter.\\
+Initially an ant is placed at a randomly chosen city and then it changes its position iteratively. At a city i, the ant chooses a still unvisited city j probabilistically, biased by the pheromone trail strength $\tau_{ij}(t)$ on the arc between city i and city j and a locally available heuristic information $\eta_{ij}$ , which is a function of the arc length $(i,j)$. The ant probabilistically prefers cities which are close and are connected by arcs with a high pheromone trail strength. After the ant has constructed a tour, the pheromones are updated. This is typically done by first lowering the pheromone trail strengths by a constant factor and then the ant is allowed to deposit pheromone on the arcs it has visited. The trail update is done such that shorter the tour, higher amounts of pheromones are deposited on those arcs.
+
+\paragraph{Probability rule for movement of the ant}
+Initially ant is placed at a randomly chosen node. At each construction step, ant applies a probabilistic action choice rule. In particular, the probability with which ant, currently at city $i$, chooses to go
+to city $j$ at the $t^{th}$ iteration of the algorithm is:\\
+
+\begin{equation}
+\begin{align}
+$p_{ij}(t) = \frac{\displaystyle{[\tau_{ij}(t)]^\alpha * [\eta_{ij}(t)]^\beta}}{\displaystyle\sum\limits_{l \in N_{i}} [\tau_{il}(t)]^\alpha * [\eta_{il}(t)]^\beta}, & \mbox{ if } j \mbox{ \in N_{i}}$
+%0 & \mbox{Otherwise} \end{cases}$ 
+\end{align}
+\end{equation}
+where, $\eta_{ij} = 1/d_{ij}$ is the priori available heruristic value, $\alpha$ and $\beta$ are two parameters which determine the relative infuence of the pheromone trail and the heuristic information, and $N_i$ is the feasible neigbhourhood of the ant at the $i^{th}$ arc, i.e., the set of nodes the ant has not visited yet. The nodes already visited get $0$ probability. The role of the parameters $\alpha$ and $\beta$ is the following. If $\alpha = 0$, the closest cities are more likely to be selected. If $\beta$ = 0, only pheromone ampli¯cation is at work, this will lead to the rapid emergence of a stagnation situation with the corresponding generation of tours which, in general, are strongly suboptimal. Search stagnation is defined as the situation where all the ants follow the same path and construct the same solution. Hence, a tradeoff between the infuence of the heuristic information and the pheromone trails exists.
+
+\paragraph{Rule for Pheromone Update}
+After an ant constructs its tour, the pheromones are updated. This is done by first reducing all the pheromones by some factor and then allowing the ant to deposit pheromones on the arcs visited. 
+
+\begin{equation}
+\begin{align} 
+\tau_{ij}(t+1) =  \begin{cases} (1-\rho)*\tau_{ij}(t) + \frac{1}{L}, & \mbox{if } ant\mbox{ visits $(i,j)$} \\ (1-\rho)*\tau_{ij}(t), & \mbox{if } ant\mbox{ does not visit $(i,j)$} \end{cases}
+\end{align}
+\end{equation}
+where $t$ is the current iteration, $0<\rho<1$ is pheromone evaporation rate and $L$ is the length of the tour. All the arcs which the ants does not visit, the second term is set to $0$ and only pheromone evaporation happens. 
+\subsection{Algorithm}
+\textbf{Initialization} - Initialize $\tau_{ij}$ and $\eta_{ij}$, \forall_{ij} \in G \\
+
+\textbf{Iteration Loop} - Loop repeat(till termination criteria is reached){\\
+\hspace{0.2cm} \textbf{Tour construction} - Loop repeat(till all nodes are visited){\\
+Calculate probability matrix using equation (1) \\
+Make the ant move based on the above probability\\
+set the probability for all the arcs from the new node to 0\\
+}
+Update pheromone trails using equation (2)
+}
+\section{Innovation}
+This process requires the ant to visit each node which makes this algorithm time consuming. Applying this algorithm in parallel should speed it up. As all the above operations can be done via matrix operations, where each element is independent of other, this process should be easy to do in parallel.
+\subsection{Standard Approach}
+ACO algorithm requires some matrix operations like 
+\begin{itemize}
+\item Initialization of pheromone matrix  
+\item Calculating the movement probabilities for each node
+\item Update pheromone matrix
+\end{itemize}
+These matrix operations are done on a CPU.
+\subsection{Drawbacks of Standard Approach}
+On a graph with huge number of nodes, the above steps can become a bottleneck and take a lot of time when done on a CPU.
+\subsection{Modification of Standard Approach}
+The above operations to be done on a GPU.
+\subsection{Expected Outcome}
+
+\section{Challenger Method}
+
+\section{Source of Data}
+
+\section{Experiment Environment}
+\begin{itemize}
+\item Number of cores - 8
+\item Operating System - Cent OS
+\item RAM - 126 GB
+\end{itemize}
+\section{Outcome of Experiment}
+\section{Outcome of Experiment w.r.t Challenger}
+\section{Comparison With Previous Iteration}
+\section{Next Steps}
+\section{References}
+\begin{itemize}
+\item http://en.wikipedia.org/wiki/Ant\_colony\_optimization\_algorithms
+\item http://www.idsia.ch/~luca/aco2004.pdf
+\item http://ace.utsa.edu/morefiles/PID1303919\%5B1\%5D.pdf
+\item http://www2.epcc.ed.ac.uk/~europa/HPCE2/Reports/0160\_GarciaCarbajal.pdf
+\end{itemize}
+\end{document}
