@@ -1,0 +1,161 @@
+
+\documentclass[a4paper]{article}
+\usepackage{alltt}
+\usepackage{animate}
+\usepackage{Sweave}
+\usepackage{lipsum}    											% Package to create dummy text
+
+\usepackage[english]{babel}								% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
+\usepackage{amsmath,amsfonts,amsthm}						% Math packages
+\usepackage[svgnames]{xcolor}								% Enabling colors by their 'svgnames'
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}		% Custom captions under/above floats
+\usepackage{epstopdf}									% Converts .eps to .pdf
+\usepackage{subfig}									% Subfigures
+\usepackage{booktabs}									% Nicer tables
+\usepackage{fix-cm}									% Custom fontsizes
+\usepackage{wrapfig}
+\usepackage[margin=0.5in]{geometry}
+\usepackage[pdftex,bookmarks=true]{hyperref}   %Bookmarks
+\usepackage{longtable}
+\usepackage{lscape}
+% Header (empty)
+\lhead{}
+\chead{}
+\rhead{}
+% Footer (you may change this to your own needs)
+\lfoot{}
+\cfoot{}
+\rfoot{}	
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+
+
+%%% Creating an initial of the very first character of the content
+
+
+%%% Title, author and date metadata
+\usepackage{titling}															% For custom titles
+
+\newcommand{\HorRule}{\color{DarkGoldenrod}%			% Creating a horizontal rule
+									  	\rule{\linewidth}{1pt}}
+
+%\begin{center}
+\pretitle{\vspace{-30pt} \begin{flushleft} \HorRule 
+				\fontsize{30}{30} \usefont{OT1}{phv}{b}{n} \color{DarkRed} \selectfont 
+				}
+\title{Muphoria Problem - Route Optimization Using Simulated Annealing}					% Title of your article goes here
+\posttitle{\par\end{flushleft}\vskip 0.5em}
+
+\preauthor{\begin{flushleft}
+					\large \lineskip 0.5em \usefont{OT1}{phv}{b}{sl} \color{DarkRed}}
+\author{Avinash Joshi\\}											% Author name goes here
+\postauthor{\footnotesize \usefont{OT1}{phv}{m}{sl} \color{DarkRed} 
+					Labs - Innovation and Development\\Mu Sigma Business Solutions Pvt Ltd \HorRule  }						% }
+%\end{center}
+
+\date{}																				% No date
+
+
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+\thispagestyle{fancy}   		% Enabling the custom headers/footers for the first page 
+\begin{abstract}
+{\normalsize Route optimization refers to finding the optimal routes for delivery vehicles to supply goods to a network of stores. The objective is to minimize the cost by choosing the optimal number of vehicles and routes that will ensure the total distance traveled by all the vehicles is least. Each store has its demand and the delivery vehicle has a weight constraint. Each vehicle has to visit all the stores in its route and meet their demands. The optimization method used is Simulated Annealing. A valid solution is generated using greedy algorithm, using that as the starting point the optimizer is run.}
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\section{Introduction}
+Network optimization is a class of problems where there are a set of nodes which are connected by paths and a ``distance" or ``cost" metric is associated with it. The objective of the problem is to find a path which connects all these nodes such that the``distance" is minimum. The best example for this class of problems is the famous ``Travelling Salesman Problem". In this problem, there is a salesman who has to visit a bunch of cities, whose pairwise distance is known. The salesman has to visit all the cities and he wants to find the path that lets him visit each city only once and the total distance traveled by him is minimum. The following problem is a modification of this problem. 
+
+\section{Problem Statement}
+GroceryKart.com is responsible for supplying fresh vegetables and produce to all mom-and-pop retail stores in Mumbai and adjoining suburbs. There are about 600 stores in their network. They have a fleet of old Matador vans that are being used to haul the goods from their central warehouse in Andheri. Given the perishable nature of the goods, all vans leave at 5:00 AM and all deliveries have to happen before 8:00 AM. Each van can make multiple stops but the union contract prevents any truck from making more than 20 stops or travelling more than 65 KM in any trip.
+
+In an effort to reduce costs and minimize greenhouse emissions, GroceryKart.com is planning to retire all the old Matador vans and purchase a new fleet of Mahindra vans. They believe the cost of purchasing the Mahindra vans will more or less be covered by the sale of Matador vans and the rest of the money will come from the existing savings fund. However, maintaining each truck costs Rs. 20,000 a month (including driver, etc.). Also, the variable cost/km of travel is around Rs. 30 for the first three years of the truck usage. Each Mahindra truck can carry up to 1000 kg at full capacity and at the end of the trip, all trucks return back to the warehouse. Each stop at the store takes 5 minutes to download (irrespective of the weight) and every KM traveled takes 90 seconds on an average.Each store is connected to the other.
+
+Can you write a program to determine the number of Mahindra vans required to be purchased and the total KM that will be traveled to service the daily demand of all the stores so as to minimize the total cost over the first three years?
+
+In this particular case, the nodes are the stores and the distance between them is what needs to be optimized. The nodes are associated with a demand (in Kgs) which acts as a constraint as the vehicles have a maximum weight limit. This problem has additional constraints, following is a list of constraints:
+
+\subsection{List of constraints:}
+\begin{itemize}
+\item All the stores have to be supplied everyday
+\item Each truck travels less than 65 Kms
+\item Each truck has maximum of 20 stores in its path
+\item Each truck reaches its final stop before coming back to the base in less than 3 hours
+\item Each truck carries less than 1000 Kgs.
+\end{itemize}
+
+\section{Simulated Annealing(SA)}
+Simulated annealing is a probabilistic method for finding an optimum value for a given objective function. Though it might not give you the lowest(in a minimization case) value but it will give you an optima. It basically searches the solution space by starting at a point and moving in its neighbourhood. It differs from other algorithms in its acceptance of a better solution. In most algorithms, if we are minimizing the cost function, the lower values are only accepted as the better solution. The drawback of these algorithms is that we run the risk of being stuck at a local optima. In Simulated Annealing, we define a temperature function which controls the acceptance of a bad(higher value) solution. The temperature is set to a high value at first and then brought down gradually and the probability of acceptance of a bad solution also falls with it. So in the beginning we readily accept bad solution hence coming out of the local optima but as time progresses we reduce this acceptance probability so that we reach at an optima.
+First an objective function is defined, next a neighbourhood generator is defined which will take the current point in the solution space and generate a neighbour. Using these two functions, we iteratively move towards an optimum.
+
+\section{Application of SA in Route Optimization}
+In simulated annealing, the crux of the problem is in defining the neighbourhood function. For the problem at hand, the objective function or in this case the more appropriate term would be \textbf{cost function} is defined like this,
+\subsection{Cost Function:}
+$Cost = (Total Distance traveled by all trucks) * 30 * 365 * 3 + (No. of Trucks) * 20000 * 12 * 3\\
+\\
+
+First, one valid solution which does not violate any of the constraints is generated using greedy algorithm. It need not be an optima but a valid solution. Simulated Annealing algorithm is started by setting the previously generated solution as the starting point. The neighbourhood function will generate the next solution for the next iteration. A solution here is a matrix in which each column tells you the route of a truck. Hence, the number of columns of this matrix is the number of trucks and the number of rows of the matrix is the maximum number of stops by any truck. This cannot be more than 20 in accordance with the list of constraints. As there are 600 stores and all the stores need to be visited, the number of trucks has to be greater than or equal to 30.
+The total weight carried by truck will be the sum of the demands of all the stores in its route. Total weight carried by each truck should be less than 1000 Kgs.
+\\
+For this problem, different neighbourhood functions were experimented with to get a good solutions. In every method, after generating a neighbour all the constraints are checked. The neighbours that violate any constraint are discarded.
+
+\paragraph{Neighbourhood Function 1} Take the previous solution which is a character matrix where each column represents the route of one truck. Now randomly choose \textbf{20 cells} and swap them with different \textbf{20 cells} ensuring that the constraints are not being violated. Thus changing the routes of a few trucks. This will search in the solution space where number of trucks and number of stops is kept constant, just the routes are changed.
+
+\paragraph{Neighbourhood Function 2} Similar to previous idea, along with the routes we change the number of stops by each truck too. This is done by allowing the final stop("Distribution Center") to be swapped too. And the routes terminate at the distribution center. More of the solution space is explored as the number of stops is not constant.
+
+\paragraph{Neighbourhood Function 3} In this method of generating neighbourhood function, after choosing the cells to be swapped, instead of randomly swapping them, we choose the nearest neighbours to the cells to be swapped and swap them. 
+
+\paragraph{Neighbourhood Function 4} In all of the above ideas, the number of swaps has been constant. This time, the number of swaps has been made the function of temperature. This means that in the beginning, the number of swaps will be high but as we come closer to the optima, the number of swaps will decrease.
+
+\section{Results}
+Amongst all the neighbourhood functions, Neighbourhood Function 2, gave the best solution. Following were the results for the Muphoria problem.
+
+\textbf{
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Total Distance & 571.5 Kms\tabularnewline
+\hline
+Number of Trucks & 31\tabularnewline
+\hline
+Total Cost & 41093775\tabularnewline
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+}
+
+\noindent Following are the top 3 results of the submissions we have received up to now.
+
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Applicant Name & Distance(in Kms) & No. of Trucks & Total Cost\tabularnewline
+\hline
+Suman \& Ayan & 574.2 & 31 & 41182470\tabularnewline
+\hline
+Avinash & 602.8 & 30 & 41401980\tabularnewline
+\hline
+Joydeep \& Biswas & 581.3 & 31 & 41415705\tabularnewline
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\section{References}
+
+\textbullet http://en.wikipedia.org/wiki/Simulated_annealing\\
+
+\noindent \textbullet http://mathworld.wolfram.com/SimulatedAnnealing.html\\
+
+
+\end{document}

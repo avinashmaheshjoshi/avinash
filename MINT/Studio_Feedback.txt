@@ -1,0 +1,11 @@
+Feedback:
+	Allows an agent to connect to itself
+	The published agencies remain green after restarting platform
+	No option to restart/just kill the agency
+	Multiple event file upload.
+	
+Suggestions:
+	Sharing R objects between agents
+	click 2 agents which are connected and see the last json sent(More apt for monitoring I think)
+	Events not being monitored in monitoring
+	

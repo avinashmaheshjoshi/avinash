@@ -1,0 +1,158 @@
+\documentclass{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{afterpage}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\section{RUnit test results}
+
+%Sourcing files chunk
+<<echo=FALSE,results=hide,comment=NA,cache=T>>=
+
+if(!is.element("xtable", installed.packages())){
+  install.packages("xtable",repos="http://lib.stat.cmu.edu/R/CRAN")
+}
+
+if(!is.element("reshape2", installed.packages())){
+  install.packages("reshape2",repos="http://lib.stat.cmu.edu/R/CRAN")
+}
+
+if(!is.element("ggplot2", installed.packages())){
+  install.packages("ggplot2",repos="http://lib.stat.cmu.edu/R/CRAN")
+}
+library("xtable")
+library("reshape2")
+library("ggplot2")
+library("gridExtra")
+
+source("runTests_mintProto.R")
+source("runProfiler_mintProto.R")
+@
+
+\subsection{Test Results Summary}
+<<echo=FALSE>>=
+test.result
+@
+
+\subsection{Test Results}
+\begin{figure}[htp]
+\begin{center}
+<<echo=FALSE,fig=TRUE,height=5>>=
+# ggplot(data=as.data.frame(resultsTable),aes(x=resultsTable[,1],fill=resultsTable[,2])) + geom_bar(position="identity",colour="black",width=0.5) +scale_fill_manual(values=c("red2","green4")) + xlab("Function Names") + ylab("") + scale_y_continuous(breaks=NA) +  opts(axis.text.x = theme_text(angle=90),axis.text.y = theme_text(size = 0),axis.title.x = theme_text(size = 15,face="bold")) + labs(colour = "") 
+genCoord <- function(mat){
+  
+  mat = mat[,1:2]
+  nTestFns = nrow(mat) 
+  xmin = rep(1,((nTestFns-1)/2))
+  xmin = c(0,xmin)
+  xmin = rep(cumsum(xmin),2)
+  ymin = c(rep(0,nTestFns/2),rep(1,nTestFns/2))
+  xmax = rep(1,nTestFns/2)
+  xmax = rep(cumsum(xmax),2)
+  ymax = c(rep(1,nTestFns/2),rep(2,nTestFns/2))
+  return(cbind(xmin,xmax,ymin,ymax))
+}
+ret = resultsTable[,1:2]
+ret1 = as.data.frame(genCoord(ret))
+if(all(ret[,2] == "success")){
+  ggplot(ret1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)) + 
+    geom_rect(colour="black", alpha = 0.5, aes(fill=ret[,2])) + 
+    scale_fill_manual(values=c("darkgreen")) + 
+    geom_text(aes(x=(ret1[,1]+ret1[,2])/2, y=(ymin+ymax)/2, label=as.character(ret[,1]),angle=90)) + 
+    theme(axis.text.y = element_blank(), 
+                       axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+                       axis.ticks.y = element_blank(), panel.grid.major.x = element_blank(), 
+                       panel.grid.major.y = element_blank(), panel.grid.minor.x = element_blank(), 
+                       panel.grid.minor.y = element_blank(),legend.title = element_blank()) + xlab("") + ylab("") 
+}
+
+if(all(ret[,2] == "failure")){
+  ggplot(ret1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)) + 
+    geom_rect(colour="black", alpha = 0.5, aes(fill=ret[,2])) + 
+    scale_fill_manual(values=c("red3")) + 
+    geom_text(aes(x=(ret1[,1]+ret1[,2])/2, y=(ymin+ymax)/2, label=as.character(ret[,1]),angle=90)) + 
+    theme(axis.text.y = element_blank(), 
+                       axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+                       axis.ticks.y = element_blank(), panel.grid.major.x = element_blank(), 
+                       panel.grid.major.y = element_blank(), panel.grid.minor.x = element_blank(), 
+                       panel.grid.minor.y = element_blank(),legend.title = element_blank()) + xlab("") + ylab("") 
+}
+
+if(length(unique(ret[,2])) == 2 && any(ret[,2] == "failure")){
+  ggplot(ret1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)) + 
+    geom_rect(colour="black", alpha = 0.5, aes(fill=ret[,2])) + 
+    scale_fill_manual(values=c("red3","darkgreen")) + 
+    geom_text(aes(x=(ret1[,1]+ret1[,2])/2, y=(ymin+ymax)/2, label=as.character(ret[,1]),angle=90)) + 
+    theme(axis.text.y = element_blank(), 
+                       axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+                       axis.ticks.y = element_blank(), panel.grid.major.x = element_blank(), 
+                       panel.grid.major.y = element_blank(), panel.grid.minor.x = element_blank(), 
+                       panel.grid.minor.y = element_blank(),legend.title = element_blank()) + xlab("") + ylab("") 
+}
+
+if(length(unique(ret[,2])) == 2 && any(ret[,2] == "error")){
+  ggplot(ret1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)) + 
+    geom_rect(colour="black", alpha = 0.5, aes(fill=ret[,2])) + 
+    scale_fill_manual(values=c("grey","darkgreen")) + 
+    geom_text(aes(x=(ret1[,1]+ret1[,2])/2, y=(ymin+ymax)/2, label=as.character(ret[,1]),angle=90)) + 
+    theme(axis.text.y = element_blank(), 
+                       axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+                       axis.ticks.y = element_blank(), panel.grid.major.x = element_blank(), 
+                       panel.grid.major.y = element_blank(), panel.grid.minor.x = element_blank(), 
+                       panel.grid.minor.y = element_blank(),legend.title = element_blank()) + xlab("") + ylab("") 
+}
+
+if(length(unique(ret[,2])) == 3){
+  ggplot(ret1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)) + 
+    geom_rect(colour="black", alpha = 0.5, aes(fill=ret[,2])) + 
+    scale_fill_manual(values=c("grey","red3","darkgreen")) + 
+    geom_text(aes(x=(ret1[,1]+ret1[,2])/2, y=(ymin+ymax)/2, label=as.character(ret[,1]),angle=90)) + 
+    theme(axis.text.y = element_blank(), 
+                       axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+                       axis.ticks.y = element_blank(), panel.grid.major.x = element_blank(), 
+                       panel.grid.major.y = element_blank(), panel.grid.minor.x = element_blank(), 
+                       panel.grid.minor.y = element_blank(),legend.title = element_blank()) + xlab("") + ylab("") 
+}
+@
+\caption{Test results for each of the RUnit test functions}
+\end{center}
+\end{figure}  
+  
+<<echo=FALSE,results=tex>>=
+library("xtable")
+#printTextProtocol(test.result,showDetails=FALSE)
+xtable(resultsTable,hline.after = -1:nrow(resultsTable),caption = "RUnit test results")
+@  
+\clearpage
+
+\section{Results of profiling of MINT Production Code}
+
+Any function taking less than 20 milliseconds is not shown in the graph as the profiler can't catch it below that
+
+\subsection{Actual Time}
+
+\begin{figure}[htp]
+<<echo=FALSE,fig=TRUE>>=
+print(actualTime_plot)
+@
+\caption{Actual time}
+\end{figure}
+
+\clearpage
+\subsection{Percentage Time}
+\begin{figure}[htp]
+<<echo=FALSE,fig=TRUE>>=
+print(pctTime_plot)
+@
+\caption{Percentage time}
+\end{figure}
+\clearpage
+
+\subsection{Memory}
+\begin{figure}[htp]
+<<echo=FALSE,fig=TRUE>>=
+print(memVal_plot)
+@
+\caption{Memory Profile}
+\end{figure}
+\end{document}

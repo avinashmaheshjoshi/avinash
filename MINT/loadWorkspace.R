@@ -1,0 +1,1 @@
+tryCatch({load("/home/musigma/MRIP/wd/sparklinesAgent.RData")}, error=function(err){errorCode<<- 600}, finally={})

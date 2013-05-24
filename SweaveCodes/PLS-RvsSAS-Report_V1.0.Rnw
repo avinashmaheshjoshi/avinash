@@ -1,0 +1,313 @@
+% Preview source code
+
+%% LyX 2.0.3 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\renewcommand{\familydefault}{\rmdefault}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=3cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage{graphicx}
+\usepackage{setspace}
+\doublespacing
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\providecommand{\LyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+%% A simple dot to overcome graphicx limitations
+\newcommand{\lyxdot}{.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\renewcommand\[{\begin{equation}}
+\renewcommand\]{\end{equation}} 
+
+\makeatother
+
+\usepackage{babel}
+\usepackage{Sweave}
+\begin{document}
+
+\title{ Partial Least Squares Regression using SAS and R }
+
+
+\author{ Avinash Mahesh Joshi \\
+ Innovation and Development \\
+ Mu Sigma Business Solutions \\
+ Bangalore}
+\maketitle
+
+ \clearpage
+\begin{abstract}
+\noindent The objective of this paper is to explore the reason for the discrepancies in the estimates calculated by R and SAS while running a partial least squares regression. Different options offered by both the softwares for performing the partial least squares regression (referred to as pls in the rest of the paper) are compared and the correct set of default options to be given to the pls algorithm are identified so that the estimates calculated by both the softwares reconcile. 
+\clearpage
+\end{abstract}
+
+\tableofcontents{}
+
+\clearpage
+
+\section{INTRODUCTION}
+
+Partial least squares regression is an extension of the multiple linear regression model. In its simplest form, a linear model specifies the (linear) relationship between a dependent (response) variable $Y$, and a set of predictor variables, the $X's$, so that
+
+$Y = b_{0} + b_{1}X_{1} + b_{2}X_{2} + ... + b_{p}X_{p}$
+
+In this equation $b_{0}$ is the regression coefficient for the intercept and the $b_{i}$ values are the regression coefficients (for variables $1$ through $p$) computed from the data.Usually, the variables in $X$ and $Y$ are centered by subtracting their means and scaled by dividing by their standard deviation. 
+
+\subsection{CENTERING}
+Centering of the data means to subtract the mean of the column from each value of that column. Both SAS and R, while running pls, inherently perform the centering of the data by subtracting the means of the columns. Though SAS gives the option of not centering the data, R does not.
+
+\subsection{SCALING}
+Scaling of the data means to divide each value by the standard deviation of its column. Both SAS and R give the option to scale the data and also to not scale it. Meaning a manually scaled dataset by the user can be given and use the not scaling option in both the softwares.
+\newline
+Next section onwards, the estimates are printed for different conditions on scaling. The number of components is 5 in all the cases. The dataset used is dell - BHM with 9 independent variables and dependent variable being revenue.
+\clearpage
+
+\section{Estimates of PLS by R and SAS without using the algorithm option for scaling.}
+These estimates are calculated, by using the option of not scaling the data in both the softwares. Basically the raw dataset is going into the algorithm and the algorithm is not scaling it.
+
+\subsection*{R code for pls}
+<<eval=FALSE,echo=TRUE,result=FALSE>>=
+library("pls")
+pub <- read.csv("workpub.csv")
+pubPls = plsr(formula=rev_disc_pub~., data=pub, ncomp=5,center=TRUE,scale=FALSE,method="kernelpls",validation = "none")  
+Estimates = round(as.vector(coef(pubPls,intercept = TRUE)),2)
+@
+
+\subsection*{SAS code for pls}
+\newline
+\textbf{\emph{proc pls data=mmxs.scaledpub method=pls NOSCALE NFAC = 5 DETAILS;
+model rev\_disc\_pub = pub\_incentive\_cost         
+print\_spend\_con\_adstk3    
+dell\_ds\_ms\_hpb\_idc\_pub\_10 
+ple\_print\_spend           
+cci                       
+total\_domore\_spend\_adstk2 
+total\_ple\_ooh\_adstk4      
+pub\_seasonality           
+sku\_on\_discount\_pub/solution; 
+quit;}}
+
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Variable Name  & Estimates in R & Estimates in SAS & OLS Estimates\tabularnewline
+\hline 
+\hline
+Intercept &  27162684.55 & 27162684.55 &  -8366642.16\tabularnewline
+\hline
+pub\_incentive\_cost &	16.34 & 16.34 & 9.60\tabularnewline 
+\hline
+print\_spend\_con\_adstk3	& 3.78 & 3.78 & 7.19 \tabularnewline
+\hline
+dell\_ds\_ms\_hpb\_idc\_pub\_10  &	0 & 0 & 44792416.62 \tabularnewline
+\hline
+ple\_print\_spend	 & 64.83 & 64.83 & -16.20\tabularnewline
+\hline
+cci	 & 0.03 & 0.03 & 73391.26 \tabularnewline
+\hline
+total\_domore\_spend\_adstk2 &	2.45 & 2.45 & -0.66\tabularnewline
+\hline
+total\_ple\_ooh\_adstk4 &	80.24 & 80.24 & 54.02\tabularnewline
+\hline
+pub\_seasonality &	0 & 0 & 23747331.77\tabularnewline
+\hline
+sku\_on\_discount\_pub &	1.15 & 1.15 & 346075.98\tabularnewline
+\hline
+\end{tabular}
+\caption{Estimates for PLS regression using R and SAS on the raw dataset and scale = FALSE}
+\end{center}
+\end{table}
+\paragraph{The estimates exactly match.}
+\clearpage
+
+\section{Estimates of PLS by R and SAS using the algorithm option for scaling.}
+These estimates are calculated, by using the option scaling the data in both the softwares. Basically the raw dataset is going into the algorithm and the algorithm is scaling it first before doing the partial least squares regression.
+
+\subsection*{R code for pls}
+<<eval=FALSE,echo=TRUE,result=FALSE>>=
+library("pls")
+pub <- read.csv("workpub.csv")
+scaledPubPls = plsr(formula=rev_disc_pub~., data=pub, ncomp=5,scale=TRUE,method="kernelpls",validation = "none")
+Estimates = round(as.vector(coef(scaledPubPls,intercept = TRUE)),2)
+@
+
+\subsection*{SAS code for pls}
+\newline
+\textbf{\emph{proc pls data=mmxs.pub method=pls NFAC = 5 DETAILS;
+model rev\_disc\_pub = pub\_incentive\_cost         
+print\_spend\_con\_adstk3    
+dell\_ds\_ms\_hpb\_idc\_pub\_10 
+ple\_print\_spend           
+cci                       
+total\_domore\_spend\_adstk2 
+total\_ple\_ooh\_adstk4      
+pub\_seasonality           
+sku\_on\_discount\_pub/solution; 
+quit;}}
+
+\noindent %
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Variable Name  & Estimates in R & Estimates in SAS & OLS estimates\tabularnewline
+\hline 
+\hline
+Intercept &  -8490337.3 & -8490337.3 & 186816654.02\tabularnewline
+\hline
+pub\_incentive\_cost &  3570596.4  & 9.66 & 9.60\tabularnewline 
+\hline
+print\_spend\_con\_adstk3	& 3838074.3  & 7.2 & 7.19\tabularnewline
+\hline
+dell\_ds\_ms\_hpb\_idc\_pub\_10  &	3338897.8  & 47443447.61 & 44792416.62\tabularnewline
+\hline
+ple\_print\_spend	 & -605225.1  & -14.99 & -16.20\tabularnewline
+\hline
+cci	 & 604803.6 &  60004.07 & 73391.26\tabularnewline
+\hline
+total\_domore\_spend\_adstk2 &	-113622.2  & -0.17 & -0.66\tabularnewline
+\hline
+total\_ple\_ooh\_adstk4 &	2608721.9  & 50.9 & 54.02\tabularnewline
+\hline
+pub\_seasonality &	7669597.2  & 23770189.23 & 23747331.77\tabularnewline
+\hline
+sku\_on\_discount\_pub &	17047188.5 &  345310.96 & 346075.98\tabularnewline
+\hline
+\end{tabular}
+\caption{Estimates for PLS regression using R and SAS on the raw dataset and scale = TRUE}
+\end{center}
+\end{table}
+\paragraph{The estimates do not match.}
+\clearpage
+
+\section{Estimates of PLS by R and SAS by manually scaling the data.}
+These estimates are calculated, by first manually scaling the data as per user's choice (in the below case, the scaling factor is standard deviation of the column) and then, using the option to not scale in the algorithm.
+
+\subsection*{R code for pls}
+<<eval=FALSE,echo=TRUE,result=FALSE>>=
+library("pls")
+pub <- read.csv("workpub.csv")
+cenScaledPub <- as.data.frame(scale(pub))
+cenScaledPubPls = plsr(formula=rev_disc_pub~., data=cenScaledPub, ncomp=5,scale=FALSE,method="kernelpls",validation = "none")
+Estimates = round(as.vector(coef(cenScaledPubPls,intercept = TRUE)),2)
+@
+
+\subsection*{SAS code for pls}
+\newline
+\textbf{\emph{proc pls data=mmxs.scaledpub method=pls NOSCALE NFAC = 5 DETAILS;
+model rev\_disc\_pub = pub\_incentive\_cost         
+print\_spend\_con\_adstk3    
+dell\_ds\_ms\_hpb\_idc\_pub\_10 
+ple\_print\_spend           
+cci                       
+total\_domore\_spend\_adstk2 
+total\_ple\_ooh\_adstk4      
+pub\_seasonality           
+sku\_on\_discount\_pub/solution; 
+quit;}}
+
+
+\begin{table}[htp]
+\noindent %
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Variable Name  & Estimates in R & Estimates in SAS & OLS estimates\tabularnewline
+\hline 
+\hline
+Intercept &  -0.22 & -0.22 & 186816654.02\tabularnewline
+\hline
+pub\_incentive\_cost &  0.09 &  0.09 &  9.60\tabularnewline 
+\hline
+print\_spend\_con\_adstk3  & 0.1 & 0.1 &  7.19\tabularnewline
+\hline
+dell\_ds\_ms\_hpb\_idc\_pub\_10  &	0.09 & 0.09 & 44792416.62\tabularnewline
+\hline
+ple\_print\_spend	 & -0.02 &  -0.02 & -16.20\tabularnewline
+\hline
+cci	 & 0.02 &  0.02 & 73391.26\tabularnewline
+\hline
+total\_domore\_spend\_adstk2 &	0.00 &  0.00 & -0.66\tabularnewline
+\hline
+total\_ple\_ooh\_adstk4 &	0.07 &  0.07 & 54.02\tabularnewline
+\hline
+pub\_seasonality &	0.2 &  0.20 & 23747331.77\tabularnewline
+\hline
+sku\_on\_discount\_pub &	0.44 &  0.44 & 346075.98\tabularnewline
+\hline
+\end{tabular}
+\caption{Estimates for PLS regression using R and SAS on the manually scaled dataset and scale = FALSE}
+\end{center}
+\end{table}
+\paragraph{The estimates exactly match.}
+\clearpage
+
+\section{Comparison of estimates for pls in R between algorithm scaling and manual scaling}
+Following table compares the estimates obtained by giving the raw dataset to the code and asking the code to scale it with the estimates obtained by manually scaling the dataset and then giving it to the algorithm asking it not to scale.
+
+\subsection*{R code for pls(algorithm scaling)}
+<<eval=FALSE,echo=TRUE,result=FALSE>>=
+pub <- read.csv("workpub.csv")
+scaledPubPls = plsr(formula=rev_disc_pub~., data=pub, ncomp=5,scale=TRUE,method="kernelpls",validation = "none")
+Estimates = round(as.vector(coef(scaledPubPls,intercept = TRUE)),2)
+@
+
+\subsection*{R code for pls(manual scaling)}
+<<eval=FALSE,echo=TRUE,result=FALSE>>=
+pub <- read.csv("workpub.csv")
+cenScaledPub <- as.data.frame(scale(pub))
+cenScaledPubPls = plsr(formula=rev_disc_pub~., data=cenScaledPub, ncomp=5,scale=FALSE,method="kernelpls",validation = "none")
+Estimates = round(as.vector(coef(cenScaledPubPls,intercept = TRUE)),2)
+@
+
+
+\begin{table}[htp]
+\begin{center}
+
+\begin{tabular}{|c|c|c|}
+\hline 
+Variables Name & Estimates in R on dataset(Scale = TRUE) & Estimates in R on manually scaled dataset\tabularnewline
+\hline 
+\hline 
+Intercept & -8490337.3 & -0.22\tabularnewline
+\hline 
+pub\_incentive\_cost & 3570596.4 & 0.09\tabularnewline
+\hline 
+print\_spend\_con\_adstk3 & 3838074.3 & 0.1\tabularnewline
+\hline 
+dell\_ds\_ms\_hpb\_idc\_pub\_10 & 3338897.8 & 0.09\tabularnewline
+\hline 
+ple\_print\_spend & -605225.1 & -0.02\tabularnewline
+\hline 
+cci & 604803.6 & 0.02\tabularnewline
+\hline 
+total\_domore\_spend\_adstk2 & -113622.2 & 0\tabularnewline
+\hline 
+total\_ple\_ooh\_adstk4 & 2608721.9 & 0.07\tabularnewline
+\hline 
+sku\_on\_discount\_pub & 17047188.5
+ & 0.44
+\tabularnewline
+\hline 
+\end{tabular}
+\caption{Estimates for pls regression in R for algorithmic scaling and manual scaling}
+\end{center}
+\end{table}
+\paragraph{Even these do not match suggesting that the scaling option is manipulating not just the dataset but also the algorithm hence should be avoided.}
+\clearpage
+
+\section{CONCLUSION}
+
+The estimate results do not match for both the softwares when the scaling option is turned on for the respective softwares. There is a difference in the way in which both the softwares deal with scaling. The best option is to manually scale the data by subtracting the mean and dividing by the standard deviation and give this standardized data to the pls algorithm. If the dataset is input in its standardized form then it is immaterial whether you choose the scaling option or not as the data will be remain the same on scaling again as the mean is `0' and standard deviation is `1'. But it is recommended that the data is manually scaled and then in the algorithm, the option not to scale is chosen. 
+\newline
+\textbf{\emph{Hence the option to not scale should be the default option and the user should be asked to center and scale the data as per user's choice and then give that dataset as an input to the algorithm in R. But now the estimates are in the standardized form (z scores form), these need to be convertedback to original form. This will result in same results by both the softwares.}}
+
+\end{document}
+
