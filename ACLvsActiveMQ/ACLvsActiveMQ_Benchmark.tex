@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{afterpage}
+\usepackage{color,fancyvrb}
+\usepackage[margin=1in]{geometry}
+\usepackage[pdftex,bookmarks=true]{hyperref}   %Bookmarks
+
+
+\title{Benchmark Agent Communication language against communication via ActiveMQ}
+\author{Avinash Joshi}
+\usepackage{Sweave}
+\begin{document}
+\input{ACLvsActiveMQ_Benchmark-concordance}
+\maketitle
+\begin{abstract}
+This paper compares two methods of communication between agents/applications.
+\begin{itemize}
+\item Agent communication language(ACL)
+\item Apache ActiveMQ
+\end{itemize}
+Jade inherently uses ACL for communication between it's agents. If an agent A is sending messages to agent B and A is faster than the B, the inbox size of B which holds the extra messages goes on increasing thereby increasing. This also increases the computation time of B. Instead of ACL, using ActiveMQ might give better results.
+\end{abstract}
+
+\section{Introduction}
+Java Agent Development Framework or JADE is an agent development framework where agents are implemented in Java. It gives you an environment to execute your agents, Class libraries to create agents and a monitoring toolkit. The agents use ACL for communicating and coordinating with each other.
+
+\section{Field of study}
+Find an effective method for communication between jade agents. Benchmark the following two methods for number of messages consumed and the time difference between the message sent and message received.
+\subsection{Hypothesis/Intuition }
+\begin{table}[htp]
+\begin{tabular}{|l|l|}
+\hline 
+Communication Method & Hypothesis\tabularnewline
+\hline 
+\hline 
+\multirow{1.ACL} &  \textbullet{} Does not need to push messages to an external application, the agent sending messages \\& should be faster and hence should send more messages\\&
+\textbullet{}The result of the above point would be that the receiving agent will have it's inbox queued\\& and hence consumption of the message would be slower\\& resulting in increase in computaion time\tabularnewline
+\hline
+\multirow{2.ActiveMQ} & \textbullet{} Needs the agent to push messages to a queue.This should slow down the agent and\\& hence lesser number of messages will be sent.\\
+&\textbullet{}The agent consuming the messages should be faster than the one consuming from it's\\& inbox as it is independent of the size.\tabularnewline
+\hline
+\end{tabular}
+\end{table}
+
+\section{Challenger Method}
+ActiveMQ can also be used for jade agents to communicate. This mode of communication challenges the conventional method of using the ACL communication which is built into the jade framework.
+
+\section{Approach to tackle the problem}
+Two agents will be created. The first agent called \emph{LatSender} will send a message which has the time at which it is sent and the number of the message. The second agent called \emph{LatReceiver} will receive the message and log the time difference as soon as it gets it.
+
+These two agents will communicate using both ACL and ActiveMQ and log their respective time differences. The results shall be later analyzed to see which mode of communication is better.
+
+\section{Experiment Environment}
+The agency is running on muESP which has the following configuration,
+\begin{itemize}
+\item OS - Ubuntu 12.04
+\item Environment - Labs - Development Environment
+\item muESP Build Version - 1.2.2S-3M-2C.4 
+\item Number of core engines - 1
+\item Number of machines in the R cluster - 4
+\item Number of active agencies - 8
+\item Number of active agents - 29
+\end{itemize}
+
+%Loading libraries
+\begin{Schunk}
+\begin{Soutput}
+[1] "C:/Users/Avinash.Joshi/Documents/GitHub/avinash/ACLvsActiveMQ"
+\end{Soutput}
+\end{Schunk}
+
+
+\end{document}

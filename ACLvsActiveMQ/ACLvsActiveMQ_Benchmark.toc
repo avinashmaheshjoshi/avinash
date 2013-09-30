@@ -1,0 +1,13 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}Problem Statement}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}List of constraints:}{3}{subsection.2.1}
+\contentsline {section}{\numberline {3}Simulated Annealing(SA)}{3}{section.3}
+\contentsline {section}{\numberline {4}Application of SA in Route Optimization}{3}{section.4}
+\contentsline {subsection}{\numberline {4.1}Cost Function:}{4}{subsection.4.1}
+\contentsline {paragraph}{Neighbourhood Function 1}{4}{section*.2}
+\contentsline {paragraph}{Neighbourhood Function 2}{4}{section*.3}
+\contentsline {paragraph}{Neighbourhood Function 3}{4}{section*.4}
+\contentsline {paragraph}{Neighbourhood Function 4}{4}{section*.5}
+\contentsline {section}{\numberline {5}Results}{4}{section.5}
+\contentsline {section}{\numberline {6}References}{4}{section.6}
