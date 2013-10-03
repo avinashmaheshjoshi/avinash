@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.9.30)  30 SEP 2013 21:58
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.9.30)  3 OCT 2013 12:41
 entering extended mode
 **ACLvsActiveMQ_Benchmark.tex
 
@@ -353,20 +353,15 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 15.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 15.
-LaTeX Font Info:    Try loading font information for OMS+aer on input line 18.
- ("C:\Program Files\MiKTeX 2.9\tex\latex\ae\omsaer.fd"
-File: omsaer.fd 1999/12/27
-)
-LaTeX Font Info:    Font shape `OMS/aer/m/n' in size <9> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 18.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 31.
+(Font)              <7> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 31.
+(Font)              <5> on input line 26.
+
 ! Undefined control sequence.
 <recently read> \multirow 
                           
-l.36 \multirow
+l.31 \multirow
               {1.ACL} &  \textbullet{} Does not need to push messages to an ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -374,12 +369,17 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
+LaTeX Font Info:    Try loading font information for OMS+aer on input line 31.
+("C:\Program Files\MiKTeX 2.9\tex\latex\ae\omsaer.fd"
+File: omsaer.fd 1999/12/27
+)
 LaTeX Font Info:    Font shape `OMS/aer/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 36.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 31.
+
 ! Undefined control sequence.
 <recently read> \multirow 
                           
-l.39 \multirow
+l.34 \multirow
               {2.ActiveMQ} & \textbullet{} Needs the agent to push messages ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -388,51 +388,70 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (63.90816pt too wide) in paragraph at lines 31--43
+Overfull \hbox (63.90816pt too wide) in paragraph at lines 26--38
 [][] 
  []
 
 [1
 
-{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
-LaTeX Font Info:    Try loading font information for T1+aett on input line 67.
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}] [2]
+<ACLvsActiveMQ_Benchmark-002.pdf, id=57, 433.62pt x 433.62pt>
+File: ACLvsActiveMQ_Benchmark-002.pdf Graphic file (type pdf)
+
+<use ACLvsActiveMQ_Benchmark-002.pdf>
+Package pdftex.def Info: ACLvsActiveMQ_Benchmark-002.pdf used on input line 85.
+
+(pdftex.def)             Requested size: 375.80544pt x 375.8238pt.
+ [3
+
+ <C:/Users/Avinash.Joshi/Documents/GitHub/avinash/ACLvsActiveMQ/ACLvsActiveMQ_B
+enchmark-002.pdf>]
+LaTeX Font Info:    Try loading font information for T1+aett on input line 100.
+
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\ae\t1aett.fd"
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 73.
- [2]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 73.
+Overfull \hbox (11.12416pt too wide) in paragraph at lines 102--103
+[][]$\T1/aett/m/n/10 http : / / en . wikipedia . org / w / index . php ? title 
+= Agent _ Communications _ Language&oldid = 544223838$[] 
+ []
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 105.
+[4
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 105.
 
 (C:\Users\Avinash.Joshi\Documents\GitHub\avinash\ACLvsActiveMQ\ACLvsActiveMQ_Be
 nchmark.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 73.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 73.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 105.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 105.
 Package rerunfilecheck Info: File `ACLvsActiveMQ_Benchmark.out' has not changed
 .
-(rerunfilecheck)             Checksum: 093DBF779581CB0D7D55B6C7F222F915;346.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 73.
+(rerunfilecheck)             Checksum: 03BF9A428B152FF7CE6D9617778F89ED;468.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 105.
  ) 
 Here is how much of TeX's memory you used:
- 6235 strings out of 493921
- 92215 string characters out of 3147258
- 178659 words of memory out of 3000000
- 9416 multiletter control sequences out of 15000+200000
- 32134 words of font info for 68 fonts, out of 3000000 for 9000
+ 6253 strings out of 493921
+ 92486 string characters out of 3147258
+ 178661 words of memory out of 3000000
+ 9422 multiletter control sequences out of 15000+200000
+ 34920 words of font info for 73 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 35i,8n,32p,362b,320s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Pr
-ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Fil
-es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX
- 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/font
-s/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
-ublic/amsfonts/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsf
-onts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
-cmsy9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pf
-b><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on ACLvsActiveMQ_Benchmark.pdf (2 pages, 132760 bytes).
+ 35i,8n,32p,555b,320s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
+cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on ACLvsActiveMQ_Benchmark.pdf (4 pages, 220765 bytes).
 PDF statistics:
- 83 PDF objects out of 1000 (max. 8388607)
- 9 named destinations out of 1000 (max. 500000)
- 53 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 114 PDF objects out of 1000 (max. 8388607)
+ 14 named destinations out of 1000 (max. 500000)
+ 82 words of extra memory for PDF output out of 10000 (max. 10000000)
 
