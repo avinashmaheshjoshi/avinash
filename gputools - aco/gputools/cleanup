@@ -1,3 +1,0 @@
-#!/bin/sh
-
-rm -f config.* src/Makefile src/*o R/gpuSvm.R R/gpuFastICA.R R/gpuSvd.R

@@ -1,1 +1,0 @@
-load("/home/musigma/MRIP/wd/urlList.RData")
